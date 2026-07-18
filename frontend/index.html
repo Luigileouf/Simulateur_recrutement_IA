@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Maquette UX/UI d'un simulateur vocal d'entretiens de recrutement.">
+  <title>EntretienLab — Préparez votre prochain entretien</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23513ccf'/%3E%3Cpath d='M18 19h28v20H29l-11 8V19Z' fill='white'/%3E%3Ccircle cx='27' cy='29' r='2.5' fill='%23513ccf'/%3E%3Ccircle cx='35' cy='29' r='2.5' fill='%23513ccf'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Aller au contenu principal</a>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" id="brand-home" href="#" aria-label="EntretienLab, revenir à l'accueil">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M6 7h20v14H14l-8 6V7Z"/><circle cx="12" cy="14" r="1.4"/><circle cx="18" cy="14" r="1.4"/></svg>
+        </span>
+        <span class="brand__name">EntretienLab</span>
+        <span class="brand__tag">Votre entraînement personnalisé</span>
+      </a>
+
+      <nav class="topbar__actions" aria-label="Navigation secondaire">
+        <button class="nav-button" type="button" id="history-button" aria-label="Ouvrir mes entraînements">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5M12 7v5l3 2"/></svg>
+          <span>Mes entraînements</span>
+        </button>
+        <button class="nav-button" type="button" id="help-button" aria-label="Ouvrir l'aide">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.7 1.8c-1 .7-1.5 1.1-1.5 2.2m0 3h.01"/></svg>
+          <span>Aide</span>
+        </button>
+        <button class="profile-button" type="button" aria-label="Ouvrir mon profil">LM</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="app-shell">
+    <nav class="journey" aria-label="Progression de l'entraînement">
+      <ol>
+        <li class="journey__step is-active" data-progress="1" aria-current="step">
+          <span class="journey__number">1</span>
+          <span><strong>Entretien</strong><small>Choisir son objectif</small></span>
+        </li>
+        <li class="journey__step" data-progress="2">
+          <span class="journey__number">2</span>
+          <span><strong>Préparation</strong><small>Vérifier le contexte</small></span>
+        </li>
+        <li class="journey__step" data-progress="3">
+          <span class="journey__number">3</span>
+          <span><strong>Simulation</strong><small>S'entraîner à l'oral</small></span>
+        </li>
+        <li class="journey__step" data-progress="4">
+          <span class="journey__number">4</span>
+          <span><strong>Bilan</strong><small>Comprendre et progresser</small></span>
+        </li>
+      </ol>
+    </nav>
+
+    <div id="app-announcer" class="sr-only" role="status" aria-live="polite"></div>
+
+    <section class="view" id="home-view" data-view="home" aria-labelledby="home-title">
+      <div class="hero">
+        <div class="hero__copy">
+          <p class="eyebrow"><span aria-hidden="true"></span> Entraînement voice-to-voice</p>
+          <h1 id="home-title" tabindex="-1">Quel entretien préparez-vous&nbsp;?</h1>
+          <p>Choisissez une situation. Votre recruteur virtuel adaptera ses questions à votre objectif et à votre niveau.</p>
+          <div class="hero__reassurance" aria-label="Informations sur le service">
+            <span><strong>8 min</strong> en moyenne</span>
+            <span><strong>Sans jugement</strong> entraînement privé</span>
+            <span><strong>Actionnable</strong> conseils personnalisés</span>
+          </div>
+        </div>
+        <div class="hero__visual" aria-hidden="true">
+          <div class="voice-orbit voice-orbit--one"></div>
+          <div class="voice-orbit voice-orbit--two"></div>
+          <div class="hero-avatar">CR</div>
+          <div class="voice-bars"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="hero-bubble">Parlez-moi de vous…</div>
+        </div>
+      </div>
+
+      <div class="interview-grid" role="group" aria-label="Type d'entretien à préparer">
+        <button class="interview-type" type="button" data-interview-type="rh" aria-pressed="false">
+          <span class="interview-type__icon interview-type__icon--violet" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          </span>
+          <span class="interview-type__copy"><strong>Premier entretien RH</strong><small>Motivation, parcours et adéquation</small></span>
+          <span class="interview-type__arrow" aria-hidden="true">→</span>
+        </button>
+        <button class="interview-type" type="button" data-interview-type="manager" aria-pressed="false">
+          <span class="interview-type__icon interview-type__icon--blue" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 20V10m8 10V4m8 16v-7"/></svg>
+          </span>
+          <span class="interview-type__copy"><strong>Entretien avec un manager</strong><small>Résultats, autonomie et collaboration</small></span>
+          <span class="interview-type__arrow" aria-hidden="true">→</span>
+        </button>
+        <button class="interview-type" type="button" data-interview-type="technique" aria-pressed="false">
+          <span class="interview-type__icon interview-type__icon--green" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 9 4 12l4 3m8-6 4 3-4 3m-3-9-2 12"/></svg>
+          </span>
+          <span class="interview-type__copy"><strong>Entretien technique</strong><small>Raisonnement, expertise et méthode</small></span>
+          <span class="interview-type__arrow" aria-hidden="true">→</span>
+        </button>
+        <button class="interview-type" type="button" data-interview-type="comportemental" aria-pressed="false">
+          <span class="interview-type__icon interview-type__icon--orange" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 5h14v11H9l-4 3V5Z"/><path d="M9 10h6m-6 3h4"/></svg>
+          </span>
+          <span class="interview-type__copy"><strong>Questions comportementales</strong><small>Structurer ses exemples avec STAR</small></span>
+          <span class="interview-type__arrow" aria-hidden="true">→</span>
+        </button>
+        <button class="interview-type" type="button" data-interview-type="final" aria-pressed="false">
+          <span class="interview-type__icon interview-type__icon--rose" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg>
+          </span>
+          <span class="interview-type__copy"><strong>Entretien final</strong><small>Convaincre et se projeter dans le poste</small></span>
+          <span class="interview-type__arrow" aria-hidden="true">→</span>
+        </button>
+        <button class="interview-type" type="button" data-interview-type="negociation" aria-pressed="false">
+          <span class="interview-type__icon interview-type__icon--teal" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5a4 4 0 1 0 0 7M8 11h6m-6 3h6"/></svg>
+          </span>
+          <span class="interview-type__copy"><strong>Négociation salariale</strong><small>Présenter sa valeur avec assurance</small></span>
+          <span class="interview-type__arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <button class="job-offer-cta" type="button" id="custom-interview-button">
+        <span class="job-offer-cta__icon" aria-hidden="true">+</span>
+        <span><strong>Créer un entretien depuis une offre</strong><small>Collez l'annonce et obtenez un scénario personnalisé.</small></span>
+        <span aria-hidden="true">Créer mon entretien →</span>
+      </button>
+
+      <section class="scenario-picker" id="scenario-picker" aria-labelledby="scenario-title" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Scénarios recommandés</p>
+            <h2 id="scenario-title" tabindex="-1">Premier entretien RH</h2>
+          </div>
+          <div class="filter-group" role="group" aria-label="Filtrer par difficulté">
+            <button type="button" class="filter-chip is-active" data-level="all" aria-pressed="true">Tous les niveaux</button>
+            <button type="button" class="filter-chip" data-level="Débutant" aria-pressed="false">Débutant</button>
+            <button type="button" class="filter-chip" data-level="Intermédiaire" aria-pressed="false">Intermédiaire</button>
+            <button type="button" class="filter-chip" data-level="Avancé" aria-pressed="false">Avancé</button>
+          </div>
+        </div>
+        <div class="scenario-grid" id="scenario-grid"></div>
+      </section>
+    </section>
+
+    <section class="view" id="prep-view" data-view="prep" aria-labelledby="prep-title" hidden>
+      <button class="back-button" type="button" data-back="home"><span aria-hidden="true">←</span> Changer d'entretien</button>
+
+      <div class="page-intro">
+        <p class="eyebrow">Votre préparation</p>
+        <h1 id="prep-title" tabindex="-1">Vous savez à quoi vous attendre</h1>
+        <p>Vérifiez le contexte et votre configuration. L'entretien commencera lorsque vous serez prêt.</p>
+      </div>
+
+      <div class="prep-layout">
+        <article class="brief-card">
+          <div class="recruiter-block">
+            <div class="recruiter-avatar" id="prep-avatar" aria-hidden="true">CR</div>
+            <div>
+              <p class="meta-label">Votre interlocuteur</p>
+              <h2 id="prep-person">Camille Robert</h2>
+              <p id="prep-role">Responsable recrutement · NovaTech</p>
+            </div>
+            <span class="difficulty-badge" id="prep-difficulty">Intermédiaire</span>
+          </div>
+
+          <dl class="brief-facts">
+            <div><dt>Poste</dt><dd id="prep-position">Product Manager</dd></div>
+            <div><dt>Durée</dt><dd id="prep-duration">8 à 10 minutes</dd></div>
+            <div><dt>Format</dt><dd id="prep-format">Premier entretien RH</dd></div>
+          </dl>
+
+          <div class="success-box">
+            <span class="success-box__icon" aria-hidden="true">✓</span>
+            <div><p class="meta-label">Votre objectif</p><p id="prep-objective">Présenter un parcours cohérent et démontrer votre motivation pour le poste.</p></div>
+          </div>
+
+          <div class="brief-section">
+            <h3>Le contexte</h3>
+            <p id="prep-context">NovaTech développe une plateforme SaaS B2B et recherche un Product Manager capable de collaborer avec les équipes produit, tech et commerciales.</p>
+          </div>
+
+          <div class="skill-section">
+            <p class="meta-label">Principalement évalué</p>
+            <div class="skill-tags" id="prep-skills"><span>Motivation</span><span>Clarté</span><span>Adéquation au poste</span></div>
+          </div>
+
+          <div class="expectation-note">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/></svg>
+            <p><strong id="prep-expectation-title">Ce que Camille cherchera à comprendre</strong><span id="prep-expectation">Pourquoi ce poste vous intéresse et ce que votre parcours peut apporter à l'équipe.</span></p>
+          </div>
+        </article>
+
+        <aside class="preflight-card" aria-labelledby="preflight-title">
+          <div class="preflight-card__header">
+            <span class="step-badge">1</span>
+            <div><h2 id="preflight-title">Choisissez votre expérience</h2><p>Vous pourrez recommencer autant de fois que nécessaire.</p></div>
+          </div>
+
+          <fieldset class="training-mode">
+            <legend>Mode d'entraînement</legend>
+            <label class="choice-card">
+              <input type="radio" name="training-mode" value="realistic" checked>
+              <span><strong>Simulation réaliste <em>Recommandé</em></strong><small>Aucun conseil pendant l'entretien.</small></span>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="training-mode" value="coach">
+              <span><strong>Mode coach</strong><small>Un conseil discret entre les questions.</small></span>
+            </label>
+          </fieldset>
+
+          <fieldset class="response-mode">
+            <legend>Comment souhaitez-vous répondre&nbsp;?</legend>
+            <div class="response-mode__grid">
+              <label class="compact-choice"><input type="radio" name="response-mode" value="voice" checked><span><strong>À l'oral</strong><small>Voice-to-voice</small></span></label>
+              <label class="compact-choice"><input type="radio" name="response-mode" value="text"><span><strong>Par écrit</strong><small>Alternative accessible</small></span></label>
+            </div>
+          </fieldset>
+
+          <div class="microphone-check" id="microphone-check">
+            <div class="microphone-check__status">
+              <span class="status-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4m-4 0h8"/></svg>
+              </span>
+              <div><strong id="mic-status-title">Micro non vérifié</strong><small id="mic-status-copy">Testez-le avant de démarrer.</small></div>
+            </div>
+            <div class="sound-bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+            <button class="button button--secondary button--full" type="button" id="test-microphone">Tester mon micro</button>
+          </div>
+
+          <label class="check-row">
+            <input type="checkbox" id="transcript-choice" checked>
+            <span><strong>Afficher la transcription</strong><small>Le transcript complet sera conservé dans votre bilan.</small></span>
+          </label>
+
+          <div class="privacy-note">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <span>Prototype : aucun son n'est capté ni enregistré.</span>
+          </div>
+
+          <button class="button button--primary button--large button--full" type="button" id="start-interview" disabled>Démarrer l'entretien <span aria-hidden="true">→</span></button>
+          <p class="button-help" id="start-help">Testez le micro pour continuer.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view interview-view" id="interview-view" data-view="interview" aria-labelledby="interview-title" hidden>
+      <div class="interview-topline">
+        <div><p class="eyebrow">Simulation en cours</p><h1 id="interview-title" tabindex="-1">Entretien avec <span id="interview-person-title">Camille Robert</span></h1></div>
+        <div class="interview-time" aria-label="Durée de l'entretien"><span class="recording-dot" aria-hidden="true"></span><time id="interview-timer">00:00</time></div>
+      </div>
+
+      <div class="interview-layout">
+        <section class="interview-stage" aria-labelledby="conversation-state-title">
+          <div class="conversation-state" id="conversation-state" role="status" aria-live="assertive">
+            <span class="conversation-state__dot" aria-hidden="true"></span>
+            <span id="conversation-state-title">Camille parle</span>
+          </div>
+
+          <div class="interview-person">
+            <div class="interview-avatar" id="interview-avatar" aria-hidden="true">CR<span class="audio-ring"></span></div>
+            <h2 id="interview-person">Camille Robert</h2>
+            <p id="interview-role">Responsable recrutement · NovaTech</p>
+          </div>
+
+          <div class="turn-guidance">
+            <strong id="turn-guidance-title">Écoutez la question</strong>
+            <span id="turn-guidance-copy">Vous pourrez répondre dès que Camille aura terminé.</span>
+          </div>
+
+          <div class="coach-cue" id="coach-cue" hidden>
+            <span aria-hidden="true">↗</span><p><strong>Conseil du coach</strong><small id="coach-tip">Répondez en moins de deux minutes et terminez par ce qui vous motive aujourd'hui.</small></p>
+          </div>
+
+          <div class="interview-controls">
+            <button class="round-control" type="button" id="mute-button" aria-label="Couper le microphone" aria-pressed="false">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4m-4 0h8"/></svg><span>Micro</span>
+            </button>
+            <button class="turn-button" type="button" id="turn-action" disabled><span class="turn-button__icon" aria-hidden="true"></span><span id="turn-action-label">Patientez…</span></button>
+            <button class="round-control round-control--danger" type="button" id="finish-interview-button" aria-label="Terminer l'entretien et générer le bilan">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 15c4.5-4 9.5-4 14 0l-2.5 3-3-1.5h-3L7.5 18 5 15Z"/></svg><span>Terminer</span>
+            </button>
+          </div>
+
+          <form class="text-reply" id="text-reply" hidden>
+            <label for="text-reply-field">Votre réponse</label>
+            <textarea id="text-reply-field" rows="4" placeholder="Écrivez votre réponse comme vous la formuleriez à l'oral…"></textarea>
+            <button class="button button--primary" type="submit">Envoyer ma réponse</button>
+          </form>
+        </section>
+
+        <aside class="transcript-card" id="transcript-panel" aria-labelledby="transcript-title">
+          <div class="transcript-card__header">
+            <div><span class="live-badge">EN DIRECT</span><h2 id="transcript-title">Transcript</h2></div>
+            <button class="icon-only" type="button" id="hide-transcript" aria-label="Masquer le transcript">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4l16 16M10.7 10.7a2 2 0 0 0 2.6 2.6M9.9 5.2A10.8 10.8 0 0 1 12 5c5.5 0 9 7 9 7a17 17 0 0 1-2.1 3.1M6.2 6.2C3.9 8 3 12 3 12s3.5 7 9 7c1 0 1.8-.2 2.6-.5"/></svg>
+            </button>
+          </div>
+          <div class="transcript-list" id="transcript-list" aria-live="polite"></div>
+          <div class="transcript-footer"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5h14v11H9l-4 3V5Z"/></svg><span>Le transcript complet sera ajouté à votre bilan.</span></div>
+        </aside>
+
+        <button class="transcript-fab" type="button" id="show-transcript" aria-label="Afficher le transcript" hidden>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5h14v11H9l-4 3V5Z"/><path d="M8 9h8m-8 3h5"/></svg> Transcript
+        </button>
+      </div>
+    </section>
+
+    <section class="view" id="report-view" data-view="report" aria-labelledby="report-title" hidden>
+      <div class="report-hero">
+        <div class="report-hero__copy">
+          <p class="eyebrow">Votre bilan personnalisé</p>
+          <h1 id="report-title" tabindex="-1">Votre discours est clair et crédible</h1>
+          <p id="report-subtitle">Vous créez une première impression professionnelle. Vos exemples gagneraient maintenant à être plus précis et mesurables.</p>
+        </div>
+        <div class="readiness-card" id="readiness-card">
+          <div class="readiness-ring" id="readiness-ring"><span id="score-value">78</span><small id="score-unit">/100</small></div>
+          <div><small>Niveau de préparation</small><strong id="score-label">Prêt à convaincre</strong><span id="score-confidence">Analyse fiable · 3 réponses</span></div>
+        </div>
+      </div>
+
+      <div class="report-summary">
+        <article class="summary-card"><span class="summary-icon summary-icon--success" aria-hidden="true">✓</span><div><p class="meta-label">Votre point fort</p><h2>Un parcours cohérent</h2><p>Vous reliez vos expériences à une progression compréhensible.</p></div></article>
+        <article class="summary-card"><span class="summary-icon summary-icon--progress" aria-hidden="true">↗</span><div><p class="meta-label">Votre prochain progrès</p><h2>Quantifier vos résultats</h2><p>Ajoutez un indicateur concret à chaque réalisation importante.</p></div></article>
+        <article class="summary-card"><span class="summary-icon summary-icon--next" aria-hidden="true">→</span><div><p class="meta-label">Exercice recommandé</p><h2>Une réponse avec STAR</h2><p>Retravaillez votre exemple de gestion d'une difficulté.</p></div></article>
+      </div>
+
+      <section class="report-card criteria-card" aria-labelledby="criteria-title">
+        <div class="report-card__header">
+          <div><p class="meta-label">Évaluation transparente</p><h2 id="criteria-title">Détail par critère</h2></div>
+          <button class="text-button" id="score-details-button" type="button" aria-expanded="false" aria-controls="score-details">Comment le résultat est calculé</button>
+        </div>
+        <div class="score-details" id="score-details" hidden>Le résultat combine cinq critères observables. Chaque évaluation est reliée à une réponse du transcript. Si moins de trois réponses sont disponibles, aucun score précis n'est affiché.</div>
+        <div class="criteria-list" id="criteria-list">
+          <article class="criterion"><div><strong>Clarté et concision</strong><span>25 % du résultat</span></div><div class="progress-track"><span style="--value:84%"></span></div><strong>84</strong><p>Votre réponse d'introduction suit un fil clair et reste facile à suivre.</p></article>
+          <article class="criterion"><div><strong>Pertinence pour le poste</strong><span>25 % du résultat</span></div><div class="progress-track"><span style="--value:81%"></span></div><strong>81</strong><p>Vous reliez votre expérience produit aux enjeux de collaboration de NovaTech.</p></article>
+          <article class="criterion"><div><strong>Qualité des exemples</strong><span>20 % du résultat</span></div><div class="progress-track"><span style="--value:69%"></span></div><strong>69</strong><p>La situation est compréhensible, mais le résultat final manque d'indicateur.</p></article>
+          <article class="criterion"><div><strong>Motivation</strong><span>20 % du résultat</span></div><div class="progress-track"><span style="--value:78%"></span></div><strong>78</strong><p>Votre intérêt est crédible ; citez un élément plus spécifique à l'entreprise.</p></article>
+          <article class="criterion"><div><strong>Expression orale</strong><span>10 % du résultat</span></div><div class="progress-track"><span style="--value:76%"></span></div><strong>76</strong><p>Le rythme est posé et professionnel, avec quelques formulations longues.</p></article>
+        </div>
+      </section>
+
+      <section class="report-card answer-review" aria-labelledby="answer-review-title">
+        <div class="report-card__header"><div><p class="meta-label">Réponse à retravailler</p><h2 id="answer-review-title">« Parlez-moi d'une difficulté que vous avez surmontée »</h2></div><span class="star-badge">Méthode STAR</span></div>
+        <div class="answer-comparison">
+          <div><h3>Votre réponse</h3><blockquote>« Sur un projet, nous avions beaucoup de retard. J'ai organisé plusieurs réunions avec l'équipe et finalement nous avons réussi à livrer. »</blockquote><p><strong>Ce qui manque :</strong> votre rôle précis, les actions prioritaires et le résultat mesuré.</p></div>
+          <div class="answer-comparison__improved"><h3>Une formulation plus convaincante</h3><blockquote>« À trois semaines du lancement, notre projet accusait dix jours de retard. J'ai réuni les responsables produit et tech pour prioriser les fonctionnalités critiques, puis instauré un suivi quotidien de quinze minutes. Nous avons livré la version essentielle à la date prévue et atteint 92 % d'adoption le premier mois. »</blockquote><button class="copy-button" type="button" id="copy-answer">Copier l'exemple</button></div>
+        </div>
+      </section>
+
+      <section class="report-card transcript-report" aria-labelledby="report-transcript-title">
+        <button class="transcript-report__toggle" type="button" id="report-transcript-toggle" aria-expanded="true" aria-controls="report-transcript-content">
+          <span><span class="transcript-report__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5h14v11H9l-4 3V5Z"/><path d="M8 9h8m-8 3h5"/></svg></span><span><small>Conversation complète</small><strong id="report-transcript-title">Transcript de l'entretien</strong></span></span>
+          <span class="transcript-report__meta"><span id="transcript-count">6 interventions</span><span aria-hidden="true" class="chevron">⌃</span></span>
+        </button>
+        <div id="report-transcript-content" class="report-transcript-content">
+          <p class="transcript-explanation">Les recommandations du bilan s'appuient sur les passages ci-dessous. Le transcript complet est conservé dans l'export.</p>
+          <div id="report-transcript-list" class="report-transcript-list"></div>
+          <button class="button button--secondary" type="button" id="download-report">Télécharger le bilan avec le transcript</button>
+        </div>
+      </section>
+
+      <div class="report-actions">
+        <button class="button button--primary button--large" type="button" id="retry-weak-answer">Retravailler ma réponse <span aria-hidden="true">↻</span></button>
+        <button class="button button--secondary button--large" type="button" id="retry-interview">Refaire cet entretien</button>
+        <button class="button button--ghost button--large" type="button" id="choose-another">Choisir un autre entretien</button>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="modal" id="finish-dialog" aria-labelledby="finish-dialog-title">
+    <form method="dialog">
+      <button class="modal__close" value="cancel" aria-label="Fermer la confirmation">×</button>
+      <span class="modal__icon modal__icon--danger" aria-hidden="true">■</span>
+      <h2 id="finish-dialog-title">Terminer l'entretien&nbsp;?</h2>
+      <p>La conversation s'arrêtera et votre bilan sera généré à partir des réponses disponibles.</p>
+      <p class="modal__notice" id="finish-dialog-notice">Pour un bilan fiable, répondez à au moins trois questions.</p>
+      <div class="modal__actions"><button class="button button--secondary" value="cancel">Continuer l'entretien</button><button class="button button--danger" value="confirm">Terminer et voir le bilan</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal modal--large" id="custom-dialog" aria-labelledby="custom-title">
+    <form id="custom-form" novalidate>
+      <button class="modal__close" type="button" data-close-dialog="custom-dialog" aria-label="Fermer la création de l'entretien">×</button>
+      <p class="eyebrow">Entretien sur mesure</p>
+      <h2 id="custom-title">Préparez une offre réelle</h2>
+      <p class="modal__lead">Trois informations suffisent pour créer un recruteur et des questions adaptées.</p>
+
+      <ol class="wizard-progress" aria-label="Progression de la création">
+        <li class="is-active" data-wizard-indicator="1"><span>1</span>Poste</li>
+        <li data-wizard-indicator="2"><span>2</span>Offre</li>
+        <li data-wizard-indicator="3"><span>3</span>Vérification</li>
+      </ol>
+
+      <div class="wizard-step" data-wizard-step="1">
+        <div class="field-group"><label for="custom-position">Quel poste préparez-vous&nbsp;?</label><input id="custom-position" type="text" required placeholder="Ex. Product Manager"><small>Utilisez l'intitulé qui apparaît dans l'offre.</small><p class="field-error" id="custom-position-error" role="alert" hidden>Indiquez le poste recherché.</p></div>
+        <div class="field-group"><label for="custom-seniority">Votre niveau d'expérience</label><select id="custom-seniority" required><option value="">Sélectionnez un niveau</option><option>Débutant · 0 à 2 ans</option><option>Intermédiaire · 3 à 5 ans</option><option>Confirmé · 6 à 10 ans</option><option>Senior · plus de 10 ans</option></select><p class="field-error" id="custom-seniority-error" role="alert" hidden>Sélectionnez votre niveau d'expérience.</p></div>
+      </div>
+
+      <div class="wizard-step" data-wizard-step="2" hidden>
+        <div class="field-group"><label for="custom-offer">Collez l'offre ou décrivez le poste</label><textarea id="custom-offer" rows="8" required placeholder="Missions, compétences attendues, secteur, contexte de l'entreprise…"></textarea><small>Ne partagez aucune information confidentielle.</small><p class="field-error" id="custom-offer-error" role="alert" hidden>Ajoutez au moins 40 caractères pour créer un entretien pertinent.</p></div>
+      </div>
+
+      <div class="wizard-step" data-wizard-step="3" hidden>
+        <div class="generated-interview">
+          <span class="generated-interview__status">Prêt à préparer</span>
+          <div class="generated-interview__person"><span>SL</span><div><small>Votre recruteuse</small><strong>Sophie Laurent</strong><p>Talent Acquisition Partner</p></div></div>
+          <dl><div><dt>Poste</dt><dd id="review-position">—</dd></div><div><dt>Niveau</dt><dd id="review-seniority">—</dd></div><div><dt>Durée</dt><dd>8 à 10 minutes</dd></div><div><dt>Questions</dt><dd>5 questions adaptées</dd></div></dl>
+          <p id="review-offer">—</p>
+        </div>
+      </div>
+
+      <div class="wizard-actions"><button class="button button--secondary" type="button" id="wizard-back" hidden>Précédent</button><button class="button button--primary" type="button" id="wizard-next">Continuer</button><button class="button button--primary" type="submit" id="wizard-submit" hidden>Utiliser cet entretien</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="help-dialog" aria-labelledby="help-title">
+    <form method="dialog">
+      <button class="modal__close" value="close" aria-label="Fermer l'aide">×</button>
+      <span class="modal__icon modal__icon--help" aria-hidden="true">?</span>
+      <h2 id="help-title">Votre entraînement en quatre étapes</h2>
+      <ol class="help-steps">
+        <li><span>1</span><div><strong>Choisissez un entretien</strong><small>Partez de la situation que vous allez réellement rencontrer.</small></div></li>
+        <li><span>2</span><div><strong>Préparez votre contexte</strong><small>Vous savez qui vous interroge et ce qui sera évalué.</small></div></li>
+        <li><span>3</span><div><strong>Répondez naturellement</strong><small>Les tours de parole sont indiqués à chaque instant.</small></div></li>
+        <li><span>4</span><div><strong>Progressez sur vos réponses</strong><small>Chaque conseil est relié au transcript.</small></div></li>
+      </ol>
+      <button class="button button--primary button--full" value="close">J'ai compris</button>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="history-dialog" aria-labelledby="history-title">
+    <form method="dialog">
+      <button class="modal__close" value="close" aria-label="Fermer mes entraînements">×</button>
+      <p class="eyebrow">Votre progression</p>
+      <h2 id="history-title">Mes entraînements</h2>
+      <div class="empty-history"><span aria-hidden="true">↗</span><strong>Votre premier bilan apparaîtra ici</strong><p>Commencez un entretien pour suivre vos progrès au fil des essais.</p></div>
+      <button class="button button--primary button--full" value="close">Choisir un entretien</button>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+livekit-agents[google]
+livekit-plugins-google
+python-dotenv
