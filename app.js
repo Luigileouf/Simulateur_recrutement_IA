@@ -490,10 +490,10 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
       const serverUrl = data.serverUrl || "wss://voice-ai-similateur-de-vente-zwon3kb4.livekit.cloud";
 
       // 3. Connexion à la salle LiveKit
-      const room = new LiveKitClient.Room();
+      const room = new LivekitClient.Room();
       state.room = room;
 
-      room.on(LiveKitClient.RoomEvent.Connected, () => {
+      room.on(LivekitClient.RoomEvent.Connected, () => {
         setConversationState("interviewer"); // Attendre que le recruteur parle en premier
         state.timerId = window.setInterval(() => {
           state.elapsed += 1;
@@ -501,26 +501,26 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
         }, 1000);
       });
 
-      room.on(LiveKitClient.RoomEvent.Disconnected, () => {
+      room.on(LivekitClient.RoomEvent.Disconnected, () => {
         clearInterviewTimers();
         showToast("Session déconnectée");
       });
 
-      room.on(LiveKitClient.RoomEvent.TrackSubscribed, (track) => {
+      room.on(LivekitClient.RoomEvent.TrackSubscribed, (track) => {
         if (track.kind === 'audio') {
           const el = track.attach();
           document.body.appendChild(el);
         }
       });
 
-      room.on(LiveKitClient.RoomEvent.TrackUnsubscribed, (track) => {
+      room.on(LivekitClient.RoomEvent.TrackUnsubscribed, (track) => {
         if (track.kind === 'audio') {
           const attached = track.detach();
           attached.forEach(el => el.remove());
         }
       });
 
-      room.on(LiveKitClient.RoomEvent.DataReceived, (payload) => {
+      room.on(LivekitClient.RoomEvent.DataReceived, (payload) => {
         try {
           const parsed = JSON.parse(new TextDecoder().decode(payload));
           if (parsed.type === 'transcript') {
@@ -534,7 +534,7 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
         }
       });
 
-      room.on(LiveKitClient.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+      room.on(LivekitClient.RoomEvent.ActiveSpeakersChanged, (speakers) => {
         const agentSpeaking = speakers.some(s => !s.isLocal);
         if (agentSpeaking) {
           setConversationState("interviewer");

@@ -7,7 +7,7 @@ import urllib.request
 import urllib.error
 from dotenv import load_dotenv
 from livekit import agents
-from livekit.agents import JobContext, WorkerOptions, cli, AgentSession, Agent
+from livekit.agents import JobContext, WorkerOptions, cli, AgentSession, Agent, JobRequest
 from livekit.plugins import google
 
 load_dotenv()
@@ -244,5 +244,15 @@ IMPORTANT - DIRECTIVE DE STYLE ET FORMAT :
     await session.generate_reply(instructions=greeting_text)
     logger.info(f"Agent vocal actif pour le recruteur {recruiter_data['name']}")
 
+async def request_fnc(req: JobRequest):
+    logger.info(f"Reçu demande de job pour le salon : {req.room.name}")
+    if req.room.name.startswith("room_recruiter-"):
+        logger.info("Salon valide pour le recrutement, acceptation du job.")
+        await req.accept()
+    else:
+        logger.info("Salon non valide pour le recrutement, rejet du job.")
+        await req.reject()
+
 if __name__ == "__main__":
-    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
+    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint, request_fnc=request_fnc))
+
