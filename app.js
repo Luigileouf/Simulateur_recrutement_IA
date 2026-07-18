@@ -294,7 +294,14 @@
     });
   }
 
-  function navigate(viewName, { focus = true } = {}) {
+  function navigate(viewName, { focus = true, bypassFeedback = false } = {}) {
+    if (viewName === "home" && state.currentView === "report" && !bypassFeedback) {
+      const feedbackDialog = $("#feedback-dialog");
+      if (feedbackDialog) {
+        feedbackDialog.showModal();
+        return;
+      }
+    }
     const stepMap = { home: 1, prep: 2, interview: 3, report: 4 };
     window.clearTimeout(announceTimeout);
     announcer.textContent = "";
@@ -694,6 +701,18 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
     }
     clearInterviewTimers();
     buildReport();
+
+    // Suivi de session anonymise dans Firestore
+    if (state.sessionId) {
+      db.collection("sessions").doc(state.sessionId).update({
+        durationSeconds: state.elapsed || 0,
+        endedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        scenarioId: state.scenario ? (state.scenario.id || "custom") : "unknown",
+        scenarioTitle: state.scenario ? (state.scenario.title || "Custom Scenario") : "Unknown",
+        status: "completed"
+      }).catch((err) => console.error("Erreur de suivi de session :", err));
+    }
+
     navigate("report");
     announce("Entretien terminé. Étape 4 sur 4, votre bilan et le transcript complet sont disponibles.");
   }
@@ -947,6 +966,94 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && state.currentView === "interview" && !$$('dialog[open]').length) $("#finish-interview-button").click();
+  });
+
+  // Feedback Questionnaire Logic
+  const feedbackDialog = $("#feedback-dialog");
+  const feedbackForm = $("#feedback-form");
+  const starsContainer = $("#feedback-stars");
+  const starsInput = $("#feedback-stars-value");
+  const stars = $$(".star", starsContainer);
+  const npsContainer = $("#feedback-nps");
+  const npsInput = $("#feedback-nps-value");
+  const npsBtns = $$(".nps-btn", npsContainer);
+
+  stars.forEach((star) => {
+    star.addEventListener("click", () => {
+      const val = parseInt(star.dataset.value, 10);
+      starsInput.value = val;
+      stars.forEach((s) => {
+        const sVal = parseInt(s.dataset.value, 10);
+        s.classList.toggle("is-selected", sVal <= val);
+      });
+    });
+  });
+
+  npsBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const val = parseInt(btn.dataset.value, 10);
+      npsInput.value = val;
+      npsBtns.forEach((b) => {
+        b.classList.toggle("is-selected", b === btn);
+      });
+    });
+  });
+
+  function resetFeedbackForm() {
+    feedbackForm.reset();
+    starsInput.value = "0";
+    npsInput.value = "0";
+    stars.forEach(s => s.classList.remove("is-selected"));
+    npsBtns.forEach(b => b.classList.remove("is-selected"));
+  }
+
+  $("#feedback-skip-btn").addEventListener("click", () => {
+    resetFeedbackForm();
+    feedbackDialog.close();
+    navigate("home", { bypassFeedback: true });
+  });
+
+  $("#feedback-close-btn").addEventListener("click", () => {
+    resetFeedbackForm();
+    feedbackDialog.close();
+    navigate("home", { bypassFeedback: true });
+  });
+
+  feedbackForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const starsValue = parseInt(starsInput.value, 10);
+    const npsValue = parseInt(npsInput.value, 10);
+    const likesText = $("#feedback-likes").value.trim();
+    const improvementsText = $("#feedback-improvements").value.trim();
+
+    if (starsValue === 0) {
+      showToast("Veuillez évaluer si l'application peut améliorer vos entretiens (étoiles).");
+      return;
+    }
+    if (npsValue === 0) {
+      showToast("Veuillez indiquer si vous recommanderiez cette application (note de 1 à 10).");
+      return;
+    }
+
+    try {
+      await db.collection("feedbacks").add({
+        sessionId: state.sessionId || "anonymous",
+        improveSalesRating: starsValue,
+        recommendRating: npsValue,
+        likes: likesText,
+        improvements: improvementsText,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        scenarioId: state.scenario ? (state.scenario.id || "custom") : "unknown",
+        scenarioTitle: state.scenario ? (state.scenario.title || "Custom Scenario") : "Unknown"
+      });
+      showToast("Merci pour votre retour !");
+    } catch (err) {
+      console.error("Erreur lors de la sauvegarde du feedback :", err);
+    }
+
+    resetFeedbackForm();
+    feedbackDialog.close();
+    navigate("home", { bypassFeedback: true });
   });
 
   populatePreparation();

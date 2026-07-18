@@ -444,6 +444,62 @@
     </form>
   </dialog>
 
+  <dialog class="modal modal--large" id="feedback-dialog" aria-labelledby="feedback-title">
+    <form id="feedback-form" novalidate>
+      <button class="modal__close" type="button" id="feedback-close-btn" aria-label="Fermer le questionnaire">×</button>
+      <p class="eyebrow">Votre avis compte</p>
+      <h2 id="feedback-title">Donnez-nous votre avis</h2>
+      <p class="modal__lead">Merci d'avoir complété votre simulation. Vos retours nous aident à améliorer l'application.</p>
+
+      <div class="feedback-questions">
+        <div class="field-group">
+          <label>1) Pensez-vous que cette application puisse améliorer vos entretiens de ventes ?</label>
+          <div class="star-rating" id="feedback-stars">
+            <button type="button" class="star" data-value="1" aria-label="1 étoile">★</button>
+            <button type="button" class="star" data-value="2" aria-label="2 étoiles">★</button>
+            <button type="button" class="star" data-value="3" aria-label="3 étoiles">★</button>
+            <button type="button" class="star" data-value="4" aria-label="4 étoiles">★</button>
+            <button type="button" class="star" data-value="5" aria-label="5 étoiles">★</button>
+          </div>
+          <input type="hidden" id="feedback-stars-value" value="0" required>
+        </div>
+
+        <div class="field-group">
+          <label>2) Recommanderiez-vous cette application ? (Note de 1 à 10)</label>
+          <div class="nps-scale" id="feedback-nps">
+            <button type="button" class="nps-btn" data-value="1">1</button>
+            <button type="button" class="nps-btn" data-value="2">2</button>
+            <button type="button" class="nps-btn" data-value="3">3</button>
+            <button type="button" class="nps-btn" data-value="4">4</button>
+            <button type="button" class="nps-btn" data-value="5">5</button>
+            <button type="button" class="nps-btn" data-value="6">6</button>
+            <button type="button" class="nps-btn" data-value="7">7</button>
+            <button type="button" class="nps-btn" data-value="8">8</button>
+            <button type="button" class="nps-btn" data-value="9">9</button>
+            <button type="button" class="nps-btn" data-value="10">10</button>
+          </div>
+          <input type="hidden" id="feedback-nps-value" value="0" required>
+        </div>
+
+        <div class="field-group">
+          <label for="feedback-likes">3) Qu'est-ce que vous aimez dans cette application ?</label>
+          <textarea id="feedback-likes" rows="3" placeholder="Ce qui vous a le plus aidé..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="feedback-improvements">4) Quelles améliorations sont nécessaires ?</label>
+          <textarea id="feedback-improvements" rows="3" placeholder="Fonctionnalités manquantes, bugs rencontrés..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <button class="button button--secondary" type="button" id="feedback-skip-btn">Passer</button>
+        <button class="button button--primary" type="submit" id="feedback-submit-btn">Soumettre</button>
+      </div>
+    </form>
+  </dialog>
+
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
