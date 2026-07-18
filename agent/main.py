@@ -201,11 +201,13 @@ IMPORTANT - DIRECTIVE DE STYLE ET FORMAT :
     
     logger.info("Initialisation du modèle Gemini Realtime")
     
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     llm = google.realtime.RealtimeModel(
         model="gemini-2.5-flash-native-audio-preview-12-2025",
         voice=recruiter_data['voice'],
         temperature=0.75,
-        instructions=system_instruction
+        instructions=system_instruction,
+        api_key=api_key
     )
     
     # Démarrage de la session agent LiveKit
