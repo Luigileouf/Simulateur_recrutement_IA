@@ -16,8 +16,8 @@ export default async function handler(req: any, res: any) {
   }
 
   // Get params from query or body
-  const identity = (req.query?.identity as string) || (req.body?.identity as string) || `user_${Math.random().toString(36).substring(2, 11)}`;
-  const room = (req.query?.room as string) || (req.body?.room as string) || `room_${Math.random().toString(36).substring(2, 11)}`;
+  const identity = (req.query?.identity as string) || (req.query?.participantName as string) || (req.body?.identity as string) || (req.body?.participantName as string) || `user_${Math.random().toString(36).substring(2, 11)}`;
+  const room = (req.query?.room as string) || (req.query?.roomName as string) || (req.body?.room as string) || (req.body?.roomName as string) || `room_${Math.random().toString(36).substring(2, 11)}`;
 
   const apiKey = process.env.LIVEKIT_API_KEY;
   const apiSecret = process.env.LIVEKIT_API_SECRET;
