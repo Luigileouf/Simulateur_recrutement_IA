@@ -22,6 +22,10 @@
       </a>
 
       <nav class="topbar__actions" aria-label="Navigation secondaire">
+        <button class="nav-button" type="button" id="dashboard-button" aria-label="Ouvrir le suivi des testeurs">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          <span>Suivi des Testeurs</span>
+        </button>
         <button class="nav-button" type="button" id="history-button" aria-label="Ouvrir mes entraînements">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5M12 7v5l3 2"/></svg>
           <span>Mes entraînements</span>
@@ -498,6 +502,65 @@
       </div>
     </form>
   </dialog>
+
+  <div id="activity-dashboard" class="dashboard-drawer" hidden>
+    <div class="dashboard-drawer__backdrop" id="dashboard-backdrop"></div>
+    <div class="dashboard-drawer__content">
+      <div class="dashboard-drawer__header">
+        <div>
+          <h2><span>📊 Suivi Live des Testeurs</span> <span class="live-indicator"></span></h2>
+          <p>Activité de recrutement en temps réel sur le MVP</p>
+        </div>
+        <button class="dashboard-drawer__close" id="dashboard-close-btn" aria-label="Fermer le suivi">&times;</button>
+      </div>
+      <div class="dashboard-drawer__identity">
+        <div class="identity-info">
+          <div style="flex: 1;">
+            <p class="identity-label">Votre identité de testeur</p>
+            <div id="identity-display">
+              <span id="visitor-name-display" style="font-weight: 700; color: #1e293b; font-size: 14px;">LM</span>
+              <button id="edit-visitor-name-btn" class="edit-btn" type="button">✏️ Modifier</button>
+            </div>
+            <div id="identity-edit" hidden>
+              <input type="text" id="visitor-name-input" placeholder="Nouveau nom..." maxlength="35" style="padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; margin-right: 6px;">
+              <button id="save-visitor-name-btn" type="button" style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; background: var(--primary); color: white; border: none; cursor: pointer;">Enregistrer</button>
+              <button id="cancel-visitor-name-btn" type="button" style="padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #e2e8f0; border: none; cursor: pointer; margin-left: 4px;">Annuler</button>
+            </div>
+          </div>
+          <span id="visitor-id-display" class="visitor-id-tag">ID: ...</span>
+        </div>
+      </div>
+      <div class="dashboard-drawer__scroll">
+        <!-- Key Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <strong id="metric-sessions">0</strong>
+            <span>Sessions</span>
+          </div>
+          <div class="metric-card">
+            <strong id="metric-visitors" style="color: var(--primary);">0</strong>
+            <span>Testeurs</span>
+          </div>
+          <div class="metric-card">
+            <strong id="metric-calls" style="color: #10b981;">0</strong>
+            <span>Simulations</span>
+          </div>
+        </div>
+        
+        <!-- Sessions List -->
+        <div class="sessions-section">
+          <h3>👥 Historique & Sessions Actives</h3>
+          <div id="sessions-list" class="sessions-list">
+            <!-- Sessions dynamically rendered here -->
+          </div>
+        </div>
+      </div>
+      <div class="dashboard-drawer__footer">
+        Les connexions se mettent à jour automatiquement via Firebase Firestore.
+      </div>
+    </div>
+  </div>
+
 
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

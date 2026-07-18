@@ -245,6 +245,301 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  // --- TRAQUEUR DE SESSIONS ET D'ACTIVITÉ EN DIRECT ---
+  const ADJECTIVES = [
+    'Intrépide', 'Affûté', 'Persuasif', 'Curieux', 'Enthousiaste', 
+    'Rigoureux', 'Dynamique', 'Souriant', 'Ambitieux', 'Méthodique', 
+    'Audacieux', 'Clairvoyant', 'Tenace', 'Diplomate', 'Combatif'
+  ];
+  
+  const NOUNS = [
+    'Candidat', 'Postulant', 'Talent', 'Professionnel', 'Expert', 
+    'Junior', 'Senior', 'Leader', 'Développeur', 'Manager'
+  ];
+
+  function generateVisitorName() {
+    const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+    const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+    const num = Math.floor(100 + Math.random() * 900);
+    return `${noun} ${adj} #${num}`;
+  }
+
+  function getOrCreateVisitor() {
+    let visitorId = localStorage.getItem('recruitment_visitor_id');
+    let visitorName = localStorage.getItem('recruitment_visitor_name');
+    
+    if (!visitorId) {
+      visitorId = 'vis_' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('recruitment_visitor_id', visitorId);
+    }
+    
+    if (!visitorName) {
+      visitorName = generateVisitorName();
+      localStorage.setItem('recruitment_visitor_name', visitorName);
+    }
+    
+    return { visitorId, visitorName };
+  }
+
+  async function startTrackingSession(sessionId) {
+    try {
+      const { visitorId, visitorName } = getOrCreateVisitor();
+      
+      const newSession = {
+        sessionId: sessionId,
+        visitorId,
+        visitorName,
+        startedAt: new Date().toISOString(),
+        lastActiveAt: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        actions: [
+          {
+            type: 'page_view',
+            label: 'A ouvert l’application',
+            timestamp: new Date().toISOString()
+          }
+        ]
+      };
+      
+      await db.collection("sessions").doc(sessionId).set(newSession);
+      return newSession;
+    } catch (error) {
+      console.error('Failed to start tracking session:', error);
+      return null;
+    }
+  }
+
+  async function logSessionAction(type, label) {
+    if (!state.sessionId) return;
+    try {
+      const action = {
+        type,
+        label,
+        timestamp: new Date().toISOString()
+      };
+      
+      await db.collection("sessions").doc(state.sessionId).update({
+        lastActiveAt: new Date().toISOString(),
+        actions: firebase.firestore.FieldValue.arrayUnion(action)
+      });
+    } catch (error) {
+      console.warn('Could not log action:', error);
+    }
+  }
+
+  async function updateVisitorName(newName) {
+    if (!newName.trim() || !state.sessionId) return;
+    localStorage.setItem('recruitment_visitor_name', newName.trim());
+    await logSessionAction('update_name', `A changé son nom pour "${newName.trim()}"`);
+    
+    try {
+      await db.collection("sessions").doc(state.sessionId).update({
+        visitorName: newName.trim(),
+        lastActiveAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.error('Failed to update visitorName:', err);
+    }
+  }
+
+  let expandedSessionId = null;
+
+  function renderActivityDashboard(sessions) {
+    const list = $("#sessions-list");
+    if (!list) return;
+
+    const totalSessions = sessions.length;
+    const uniqueVisitors = new Set(sessions.map(s => s.visitorId)).size;
+    const totalCalls = sessions.reduce((acc, s) => 
+      acc + (s.actions || []).filter(a => a.type === 'start_roleplay').length, 0
+    );
+
+    $("#metric-sessions").textContent = totalSessions;
+    $("#metric-visitors").textContent = uniqueVisitors;
+    $("#metric-calls").textContent = totalCalls;
+
+    const { visitorId: currentVisitorId } = getOrCreateVisitor();
+
+    list.innerHTML = sessions.map((sess) => {
+      const isCurrent = sess.visitorId === currentVisitorId;
+      const isExpanded = expandedSessionId === sess.sessionId;
+      const isSessionActive = new Date().getTime() - new Date(sess.lastActiveAt).getTime() < 300000;
+      
+      const actionsHtml = (sess.actions || []).map((act) => {
+        let iconClass = '';
+        let icon = '•';
+        if (act.type === 'start_roleplay') { iconClass = 'start'; icon = '▶'; }
+        else if (act.type === 'end_roleplay') { iconClass = 'end'; icon = '■'; }
+        else if (act.type === 'select_scenario') { iconClass = 'select'; icon = '👤'; }
+        else if (act.type === 'update_name') { iconClass = 'select'; icon = '✏️'; }
+        
+        return `
+          <div class="timeline-item">
+            <div class="timeline-icon ${iconClass}">${icon}</div>
+            <div class="timeline-label-row">
+              <span class="timeline-label">${act.label}</span>
+              <span class="timeline-time">${formatTimeStr(act.timestamp)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      let feedbackHtml = '';
+      if (sess.feedback) {
+        feedbackHtml = `
+          <div class="session-feedback-block">
+            <p class="feedback-header">📝 Avis Qualitatif Soumis</p>
+            <div class="feedback-metrics">
+              <div class="feedback-metric-box">
+                <span>Amélioration entretiens :</span>
+                <strong>${sess.feedback.improveProcessAndTechniques} ★</strong>
+              </div>
+              <div class="feedback-metric-box">
+                <span>Recommandation :</span>
+                <strong>${sess.feedback.helpCareerProgress} / 10</strong>
+              </div>
+            </div>
+            ${sess.feedback.liked ? `
+              <div class="feedback-text-box">
+                <span>Ce qui a plu :</span>
+                <p>"${sess.feedback.liked}"</p>
+              </div>
+            ` : ''}
+            ${sess.feedback.improved ? `
+              <div class="feedback-text-box">
+                <span>Améliorations nécessaires :</span>
+                <p>"${sess.feedback.improved}"</p>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      return `
+        <div class="session-item ${isCurrent ? 'is-current' : ''}" data-session-id="${sess.sessionId}">
+          <div class="session-summary">
+            <div class="session-avatar-wrapper">
+              <div class="session-avatar ${isSessionActive ? 'is-active' : ''}">
+                ${(sess.visitorName || 'T').charAt(0)}
+              </div>
+              <div>
+                <div class="session-meta-name">
+                  <span>${sess.visitorName || 'Testeur anonyme'}</span>
+                  ${isCurrent ? '<span class="badge-me">Moi</span>' : ''}
+                </div>
+                <span class="session-meta-subtitle">
+                  Actif ${formatRelativeTimeStr(sess.lastActiveAt)} • ${(sess.actions || []).length} action${(sess.actions || []).length > 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+            <div class="session-time-toggle">
+              <span class="font-mono">${formatTimeStr(sess.startedAt)}</span>
+              <span>${isExpanded ? '▲' : '▼'}</span>
+            </div>
+          </div>
+          
+          <div class="session-details" ${isExpanded ? '' : 'hidden'}>
+            <p class="details-title">Fil d'activité de la session</p>
+            <div class="actions-timeline">
+              ${actionsHtml}
+            </div>
+            ${feedbackHtml}
+            <div class="session-footer-meta">
+              <span>Plateforme : ${sess.userAgent.includes('Mac') ? 'Mac' : sess.userAgent.includes('Windows') ? 'Windows' : 'Mobile'}</span>
+              <span>ID Session: ${(sess.sessionId || '').replace('sess_', '')}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    $$(".session-summary", list).forEach((el) => {
+      el.removeEventListener("click", toggleSessionItem); // Prevent duplicates
+      el.addEventListener("click", toggleSessionItem);
+    });
+  }
+
+  function toggleSessionItem(e) {
+    const el = e.currentTarget;
+    const item = el.closest(".session-item");
+    const sId = item.dataset.sessionId;
+    expandedSessionId = expandedSessionId === sId ? null : sId;
+    
+    // Trigger dashboard update manually from loaded data
+    db.collection("sessions").orderBy("lastActiveAt", "desc").limit(100).get().then(snapshot => {
+      const sessions = [];
+      snapshot.forEach(doc => sessions.push(doc.data()));
+      renderActivityDashboard(sessions);
+    });
+  }
+
+  function formatTimeStr(isoString) {
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch {
+      return '';
+    }
+  }
+
+  function formatRelativeTimeStr(isoString) {
+    try {
+      const date = new Date(isoString);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffMin = Math.floor(diffMs / 60000);
+      
+      if (diffMin < 1) return "À l'instant";
+      if (diffMin < 60) return `Il y a ${diffMin} min`;
+      
+      const diffHr = Math.floor(diffMin / 60);
+      if (diffHr < 24) return `Il y a ${diffHr} h`;
+      
+      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    } catch {
+      return '';
+    }
+  }
+
+  let activeUnsubscribe = null;
+
+  function listenToSessionsRealtime() {
+    if (activeUnsubscribe) activeUnsubscribe();
+    
+    const list = $("#sessions-list");
+    if (list) {
+      list.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 12px;">
+          <div style="width: 32px; height: 32px; border: 2px solid var(--primary); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <span style="font-size: 12px; color: var(--ink-soft);">Chargement des connexions en direct...</span>
+        </div>
+      `;
+    }
+
+    activeUnsubscribe = db.collection("sessions")
+      .orderBy("lastActiveAt", "desc")
+      .limit(100)
+      .onSnapshot((snapshot) => {
+        const sessions = [];
+        snapshot.forEach((doc) => {
+          sessions.push(doc.data());
+        });
+        renderActivityDashboard(sessions);
+      }, (error) => {
+        console.error("Error in real-time listener:", error);
+        if (list) {
+          list.innerHTML = `
+            <div style="padding: 16px; background: var(--danger-soft); color: var(--danger); border-radius: 12px; font-size: 12px;">
+              <strong>Erreur de connexion Firestore</strong>
+              <p style="margin: 4px 0 0;">${error.message || error}</p>
+            </div>
+          `;
+        }
+      });
+  }
+
+  const initialSessionId = "sess_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+
   const state = {
     currentView: "home",
     selectedType: null,
@@ -253,7 +548,7 @@
     trainingMode: "realistic",
     responseMode: "voice",
     voiceMicReady: false,
-    transcriptVisible: false, // Force hidden by default as requested
+    transcriptVisible: false,
     elapsed: 0,
     timerId: null,
     phaseTimeout: null,
@@ -263,8 +558,11 @@
     messages: [],
     wizardStep: 1,
     room: null,
-    sessionId: null
+    sessionId: initialSessionId
   };
+
+  // Start initial tracking session
+  startTrackingSession(initialSessionId);
 
   const announcer = $("#app-announcer");
   const toast = $("#toast");
@@ -301,6 +599,9 @@
         feedbackDialog.showModal();
         return;
       }
+    }
+    if (viewName === "home") {
+      logSessionAction('reset_game', 'Est retourné à la liste de sélection des prospects');
     }
     const stepMap = { home: 1, prep: 2, interview: 3, report: 4 };
     window.clearTimeout(announceTimeout);
@@ -343,6 +644,7 @@
     const scenario = scenarios.find((item) => item.id === id);
     if (!scenario) return;
     state.scenario = scenario;
+    logSessionAction('select_scenario', `A sélectionné le prospect : ${scenario.person}`);
     populatePreparation();
     navigate("prep");
     announce(`Entretien sélectionné : ${scenario.title}. Étape 2 sur 4, préparation.`);
@@ -453,8 +755,8 @@
     setConversationState("connecting");
     navigate("interview");
 
-    const sessionId = "sess_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
-    state.sessionId = sessionId;
+    const sessionId = state.sessionId;
+    logSessionAction('start_roleplay', `A démarré la simulation orale avec ${state.scenario.person}`);
 
     try {
       // 1. Enregistrement de la session dans Firestore
@@ -710,6 +1012,8 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
         scenarioId: state.scenario ? (state.scenario.id || "custom") : "unknown",
         scenarioTitle: state.scenario ? (state.scenario.title || "Custom Scenario") : "Unknown",
         status: "completed"
+      }).then(() => {
+        logSessionAction('end_roleplay', `A raccroché l'appel. Simulation terminée (${state.exchangeCount} répliques)`);
       }).catch((err) => console.error("Erreur de suivi de session :", err));
     }
 
@@ -1010,12 +1314,14 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
   $("#feedback-skip-btn").addEventListener("click", () => {
     resetFeedbackForm();
     feedbackDialog.close();
+    logSessionAction('skip_feedback', 'A ignoré le questionnaire de feedback qualitatif');
     navigate("home", { bypassFeedback: true });
   });
 
   $("#feedback-close-btn").addEventListener("click", () => {
     resetFeedbackForm();
     feedbackDialog.close();
+    logSessionAction('skip_feedback', 'A ignoré le questionnaire de feedback qualitatif');
     navigate("home", { bypassFeedback: true });
   });
 
@@ -1046,6 +1352,20 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
         scenarioId: state.scenario ? (state.scenario.id || "custom") : "unknown",
         scenarioTitle: state.scenario ? (state.scenario.title || "Custom Scenario") : "Unknown"
       });
+
+      // Enregistre également le feedback directement sur la session pour le suivi live
+      if (state.sessionId) {
+        await db.collection("sessions").doc(state.sessionId).update({
+          feedback: {
+            improveProcessAndTechniques: starsValue,
+            helpCareerProgress: npsValue,
+            liked: likesText,
+            improved: improvementsText
+          }
+        }).catch(err => console.error("Erreur de sauvegarde feedback sur session:", err));
+      }
+
+      await logSessionAction('submit_feedback', 'A soumis le questionnaire de feedback qualitatif');
       showToast("Merci pour votre retour !");
     } catch (err) {
       console.error("Erreur lors de la sauvegarde du feedback :", err);
@@ -1055,6 +1375,70 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
     feedbackDialog.close();
     navigate("home", { bypassFeedback: true });
   });
+
+  // --- GESTION DES EVENEMENTS DU SUIVI DES TESTEURS ---
+  const activityDashboard = $("#activity-dashboard");
+  const dashboardBtn = $("#dashboard-button");
+  const dashboardCloseBtn = $("#dashboard-close-btn");
+  const dashboardBackdrop = $("#dashboard-backdrop");
+
+  if (dashboardBtn) {
+    dashboardBtn.addEventListener("click", () => {
+      activityDashboard.hidden = false;
+      const visitor = getOrCreateVisitor();
+      $("#visitor-name-display").textContent = visitor.visitorName;
+      $("#visitor-id-display").textContent = "ID: " + visitor.visitorId.replace('vis_', '');
+      $("#visitor-name-input").value = visitor.visitorName;
+      
+      listenToSessionsRealtime();
+      logSessionAction('open_dashboard', 'A ouvert le suivi des testeurs');
+    });
+  }
+
+  function closeDashboard() {
+    if (activityDashboard) activityDashboard.hidden = true;
+    if (activeUnsubscribe) {
+      activeUnsubscribe();
+      activeUnsubscribe = null;
+    }
+  }
+
+  if (dashboardCloseBtn) dashboardCloseBtn.addEventListener("click", closeDashboard);
+  if (dashboardBackdrop) dashboardBackdrop.addEventListener("click", closeDashboard);
+
+  const editNameBtn = $("#edit-visitor-name-btn");
+  const identityDisplay = $("#identity-display");
+  const identityEdit = $("#identity-edit");
+  const nameInput = $("#visitor-name-input");
+  const saveNameBtn = $("#save-visitor-name-btn");
+  const cancelNameBtn = $("#cancel-visitor-name-btn");
+
+  if (editNameBtn) {
+    editNameBtn.addEventListener("click", () => {
+      identityDisplay.hidden = true;
+      identityEdit.hidden = false;
+      nameInput.focus();
+    });
+  }
+
+  if (cancelNameBtn) {
+    cancelNameBtn.addEventListener("click", () => {
+      identityDisplay.hidden = false;
+      identityEdit.hidden = true;
+    });
+  }
+
+  if (saveNameBtn) {
+    saveNameBtn.addEventListener("click", async () => {
+      const newName = nameInput.value.trim();
+      if (!newName) return;
+      
+      await updateVisitorName(newName);
+      $("#visitor-name-display").textContent = newName;
+      identityDisplay.hidden = false;
+      identityEdit.hidden = true;
+    });
+  }
 
   populatePreparation();
 })();
