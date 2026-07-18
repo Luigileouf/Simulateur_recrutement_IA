@@ -269,7 +269,7 @@ IMPORTANT - DIRECTIVE DE STYLE ET FORMAT :
     def on_conversation_item_added(event):
         item = event.item
         # Filtrer uniquement l'assistant pour éviter les doublons avec user_input_transcribed
-        if item.role == 'assistant' and item.text_content:
+        if hasattr(item, 'role') and item.role == 'assistant' and item.text_content:
             logger.info(f"Prospect transcript : {item.text_content}")
             payload = json.dumps({
                 'type': 'transcript',
