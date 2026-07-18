@@ -6,3 +6,4 @@ agent/venv/
 agent/.env
 *.log
 .DS_Store
+.vercel

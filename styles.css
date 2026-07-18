@@ -297,6 +297,7 @@ h3 { margin-bottom: 6px; font-size: 16px; }
 .recording-dot { width: 8px; height: 8px; border-radius: 50%; background: #e14c61; box-shadow: 0 0 0 5px rgb(225 76 97 / 12%); animation: pulse 1.6s ease infinite; }
 @keyframes pulse { 50% { box-shadow: 0 0 0 8px rgb(225 76 97 / 0%); } }
 .interview-layout { position: relative; display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr); gap: 16px; }
+.interview-layout.transcript-hidden { grid-template-columns: 1fr; max-width: 720px; margin: 0 auto; }
 .interview-stage { display: flex; min-height: 600px; flex-direction: column; align-items: center; padding: 28px; border-radius: 26px; color: white; background: radial-gradient(circle at 50% 27%, #29385d 0, var(--interview-surface) 53%); box-shadow: var(--shadow-md); }
 .conversation-state { display: inline-flex; align-items: center; gap: 9px; padding: 7px 13px; border: 1px solid rgb(255 255 255 / 15%); border-radius: 999px; color: #f7f8fc; background: rgb(255 255 255 / 8%); font-size: 13px; font-weight: 850; }
 .conversation-state__dot { width: 8px; height: 8px; border-radius: 50%; background: #ac99ff; box-shadow: 0 0 0 5px rgb(172 153 255 / 15%); }

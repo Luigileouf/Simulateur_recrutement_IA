@@ -214,7 +214,7 @@
             </label>
           </fieldset>
 
-          <fieldset class="response-mode">
+          <fieldset class="response-mode" style="display: none;">
             <legend>Comment souhaitez-vous répondre&nbsp;?</legend>
             <div class="response-mode__grid">
               <label class="compact-choice"><input type="radio" name="response-mode" value="voice" checked><span><strong>À l'oral</strong><small>Voice-to-voice</small></span></label>
@@ -233,8 +233,8 @@
             <button class="button button--secondary button--full" type="button" id="test-microphone">Tester mon micro</button>
           </div>
 
-          <label class="check-row">
-            <input type="checkbox" id="transcript-choice" checked>
+          <label class="check-row" style="display: none;">
+            <input type="checkbox" id="transcript-choice">
             <span><strong>Afficher la transcription</strong><small>Le transcript complet sera conservé dans votre bilan.</small></span>
           </label>
 
@@ -445,6 +445,11 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <!-- LiveKit SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -234,6 +234,17 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
+  const firebaseConfig = {
+    projectId: "recrutement-simulator-ia",
+    appId: "1:791451832682:web:d3f138563e47f7dd22d513",
+    apiKey: "AIzaSyDZWPV0fqKyFteSjdaVuoOKu_u-oxrQMMY",
+    authDomain: "recrutement-simulator-ia.firebaseapp.com",
+    storageBucket: "recrutement-simulator-ia.firebasestorage.app",
+    messagingSenderId: "791451832682"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
   const state = {
     currentView: "home",
     selectedType: null,
@@ -242,7 +253,7 @@
     trainingMode: "realistic",
     responseMode: "voice",
     voiceMicReady: false,
-    transcriptVisible: true,
+    transcriptVisible: false, // Force hidden by default as requested
     elapsed: 0,
     timerId: null,
     phaseTimeout: null,
@@ -250,7 +261,9 @@
     exchangeCount: 0,
     round: 0,
     messages: [],
-    wizardStep: 1
+    wizardStep: 1,
+    room: null,
+    sessionId: null
   };
 
   const announcer = $("#app-announcer");
@@ -405,40 +418,143 @@
     state.phaseTimeout = null;
   }
 
-  function startInterview() {
+  async function startInterview() {
     clearInterviewTimers();
     state.elapsed = 0;
     state.exchangeCount = 0;
     state.round = 0;
     state.messages = [];
-    state.transcriptVisible = $("#transcript-choice").checked;
+    state.transcriptVisible = false; // Toujours masqué pendant l'appel
+
     $("#interview-timer").textContent = "00:00";
     $("#interview-person-title").textContent = state.scenario.person;
     $("#interview-person").textContent = state.scenario.person;
     $("#interview-role").textContent = state.scenario.role;
     $("#interview-avatar").childNodes[0].nodeValue = state.scenario.initials;
     $("#transcript-list").innerHTML = "";
-    $("#transcript-panel").hidden = !state.transcriptVisible;
-    $("#show-transcript").hidden = state.transcriptVisible;
-    $(".interview-stage").dataset.responseMode = state.responseMode;
-    $("#mute-button").hidden = state.responseMode === "text";
+    
+    // Masquer le panneau de transcription en direct
+    $("#transcript-panel").hidden = true;
+    $("#show-transcript").hidden = true;
+    $(".interview-layout").classList.add("transcript-hidden");
+
+    $(".interview-stage").dataset.responseMode = "voice";
+    $("#mute-button").hidden = false;
     $("#mute-button").setAttribute("aria-pressed", "false");
     $("#mute-button").setAttribute("aria-label", "Couper le microphone");
+    
+    setConversationState("connecting");
     navigate("interview");
-    state.timerId = window.setInterval(() => {
-      state.elapsed += 1;
-      $("#interview-timer").textContent = formatTime(state.elapsed);
-    }, 1000);
-    askCurrentQuestion();
+
+    const sessionId = "sess_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+    state.sessionId = sessionId;
+
+    try {
+      // 1. Enregistrement de la session dans Firestore
+      if (state.scenario.id.startsWith("custom")) {
+        const customPrompt = `Tu es ${state.scenario.person}, ${state.scenario.role}. Tu fais passer un entretien d'embauche personnalisé pour le poste de ${state.scenario.position} (Niveau : ${state.scenario.level}).
+L'offre d'emploi ou le contexte de l'entreprise est le suivant :
+${state.scenario.context}
+
+Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillante mais rigoureuse. Pose ces questions une par une au fil de l'entretien en réagissant brièvement à ce que dit le candidat :
+1. ${state.scenario.questions[0]} (Déjà posée au démarrage)
+2. ${state.scenario.questions[1]}
+3. ${state.scenario.questions[2]}
+4. ${state.scenario.questions[3]}
+5. ${state.scenario.questions[4]}
+`;
+        await db.collection("sessions").doc(sessionId).set({
+          activeProspect: {
+            name: state.scenario.person,
+            role: state.scenario.role,
+            voiceName: 'Aoede',
+            systemInstruction: customPrompt
+          },
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } else {
+        await db.collection("sessions").doc(sessionId).set({
+          recruiterId: state.scenario.id,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      }
+
+      // 2. Récupération du jeton LiveKit
+      const roomName = `room_recruiter-${state.scenario.id}_session-${sessionId}`;
+      const response = await fetch(`/api/get-token?roomName=${encodeURIComponent(roomName)}&participantName=candidat`);
+      if (!response.ok) {
+        throw new Error("Impossible de générer le jeton de connexion");
+      }
+      const data = await response.json();
+      const token = data.token;
+      const serverUrl = data.serverUrl || "wss://voice-ai-similateur-de-vente-zwon3kb4.livekit.cloud";
+
+      // 3. Connexion à la salle LiveKit
+      const room = new LiveKitClient.Room();
+      state.room = room;
+
+      room.on(LiveKitClient.RoomEvent.Connected, () => {
+        setConversationState("interviewer"); // Attendre que le recruteur parle en premier
+        state.timerId = window.setInterval(() => {
+          state.elapsed += 1;
+          $("#interview-timer").textContent = formatTime(state.elapsed);
+        }, 1000);
+      });
+
+      room.on(LiveKitClient.RoomEvent.Disconnected, () => {
+        clearInterviewTimers();
+        showToast("Session déconnectée");
+      });
+
+      room.on(LiveKitClient.RoomEvent.TrackSubscribed, (track) => {
+        if (track.kind === 'audio') {
+          const el = track.attach();
+          document.body.appendChild(el);
+        }
+      });
+
+      room.on(LiveKitClient.RoomEvent.TrackUnsubscribed, (track) => {
+        if (track.kind === 'audio') {
+          const attached = track.detach();
+          attached.forEach(el => el.remove());
+        }
+      });
+
+      room.on(LiveKitClient.RoomEvent.DataReceived, (payload) => {
+        try {
+          const parsed = JSON.parse(new TextDecoder().decode(payload));
+          if (parsed.type === 'transcript') {
+            const role = parsed.role === 'user' ? 'candidate' : 'recruiter';
+            const speaker = role === 'candidate' ? 'Vous' : state.scenario.person;
+            addTranscript(role, speaker, parsed.text);
+            state.exchangeCount = state.messages.filter(m => m.type === 'candidate').length;
+          }
+        } catch (e) {
+          console.error("Erreur de parsing du message canal de données :", e);
+        }
+      });
+
+      room.on(LiveKitClient.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+        const agentSpeaking = speakers.some(s => !s.isLocal);
+        if (agentSpeaking) {
+          setConversationState("interviewer");
+        } else {
+          setConversationState("user-ready");
+        }
+      });
+
+      await room.connect(serverUrl, token);
+      await room.localParticipant.setMicrophoneEnabled(true);
+
+    } catch (err) {
+      console.error("Échec de connexion LiveKit:", err);
+      showToast(err.message || "Échec d'établissement de l'appel");
+      navigate("prep");
+    }
   }
 
   function askCurrentQuestion() {
-    setConversationState("interviewer");
-    const question = state.scenario.questions[Math.min(state.round, state.scenario.questions.length - 1)];
-    state.phaseTimeout = window.setTimeout(() => {
-      addTranscript("recruiter", state.scenario.person, question);
-      state.phaseTimeout = window.setTimeout(() => setConversationState("user-ready"), 1900);
-    }, 650);
+    // Remplacé par l'interaction LiveKit temps-réel
   }
 
   function setConversationState(conversationState) {
@@ -457,28 +573,29 @@
     textForm.hidden = true;
     coachCue.hidden = true;
 
+    if (conversationState === "connecting") {
+      $("#conversation-state-title").textContent = "Connexion en cours";
+      $("#turn-guidance-title").textContent = "Appel en cours d'établissement";
+      $("#turn-guidance-copy").textContent = "Veuillez autoriser l'accès au micro si demandé.";
+      action.disabled = true;
+      label.textContent = "Connexion…";
+    }
     if (conversationState === "interviewer") {
-      $("#conversation-state-title").textContent = `${firstName} vous pose une question`;
-      $("#turn-guidance-title").textContent = "Écoutez la question";
+      $("#conversation-state-title").textContent = `${firstName} vous parle`;
+      $("#turn-guidance-title").textContent = "Écoutez le recruteur";
       $("#turn-guidance-copy").textContent = `Vous pourrez répondre dès que ${firstName} aura terminé.`;
       action.disabled = true;
       label.textContent = "Patientez…";
     }
     if (conversationState === "user-ready") {
       $("#conversation-state-title").textContent = "À vous de répondre";
-      $("#turn-guidance-title").textContent = state.responseMode === "text" ? "Formulez votre réponse" : "Votre recruteur vous écoute";
-      $("#turn-guidance-copy").textContent = state.responseMode === "text" ? "Écrivez comme vous parleriez pendant l'entretien." : "Appuyez sur le bouton lorsque vous êtes prêt.";
+      $("#turn-guidance-title").textContent = "Votre recruteur vous écoute";
+      $("#turn-guidance-copy").textContent = "Parlez naturellement pour répondre.";
+      action.disabled = true;
+      label.textContent = "Parlez…";
       if (state.trainingMode === "coach") {
         $("#coach-tip").textContent = state.scenario.coachTips[Math.min(state.round, state.scenario.coachTips.length - 1)];
         coachCue.hidden = false;
-      }
-      if (state.responseMode === "text") {
-        action.hidden = true;
-        textForm.hidden = false;
-        window.requestAnimationFrame(() => $("#text-reply-field").focus());
-      } else {
-        action.disabled = false;
-        label.textContent = "Commencer à répondre";
       }
     }
     if (conversationState === "listening") {
@@ -571,6 +688,10 @@
   }
 
   function finishAndShowReport() {
+    if (state.room) {
+      state.room.disconnect();
+      state.room = null;
+    }
     clearInterviewTimers();
     buildReport();
     navigate("report");
@@ -725,11 +846,15 @@
   });
   $("#text-reply-field").addEventListener("input", (event) => event.target.setCustomValidity(""));
 
-  $("#mute-button").addEventListener("click", (event) => {
+  $("#mute-button").addEventListener("click", async (event) => {
     const pressed = event.currentTarget.getAttribute("aria-pressed") === "true";
-    event.currentTarget.setAttribute("aria-pressed", String(!pressed));
-    event.currentTarget.setAttribute("aria-label", pressed ? "Couper le microphone" : "Réactiver le microphone");
-    showToast(pressed ? "Micro réactivé" : "Micro coupé");
+    const nextMuted = !pressed;
+    event.currentTarget.setAttribute("aria-pressed", String(nextMuted));
+    event.currentTarget.setAttribute("aria-label", nextMuted ? "Réactiver le microphone" : "Couper le microphone");
+    if (state.room) {
+      await state.room.localParticipant.setMicrophoneEnabled(!nextMuted);
+    }
+    showToast(nextMuted ? "Micro coupé" : "Micro réactivé");
   });
 
   const finishDialog = $("#finish-dialog");
