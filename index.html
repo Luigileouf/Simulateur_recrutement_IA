@@ -329,9 +329,9 @@
       </div>
 
       <div class="report-summary">
-        <article class="summary-card"><span class="summary-icon summary-icon--success" aria-hidden="true">✓</span><div><p class="meta-label">Votre point fort</p><h2>Un parcours cohérent</h2><p>Vous reliez vos expériences à une progression compréhensible.</p></div></article>
-        <article class="summary-card"><span class="summary-icon summary-icon--progress" aria-hidden="true">↗</span><div><p class="meta-label">Votre prochain progrès</p><h2>Quantifier vos résultats</h2><p>Ajoutez un indicateur concret à chaque réalisation importante.</p></div></article>
-        <article class="summary-card"><span class="summary-icon summary-icon--next" aria-hidden="true">→</span><div><p class="meta-label">Exercice recommandé</p><h2>Une réponse avec STAR</h2><p>Retravaillez votre exemple de gestion d'une difficulté.</p></div></article>
+        <article class="summary-card"><span class="summary-icon summary-icon--success" aria-hidden="true">✓</span><div><p class="meta-label">Votre point fort</p><h2 id="report-strength-title">Un parcours cohérent</h2><p id="report-strength-desc">Vous reliez vos expériences à une progression compréhensible.</p></div></article>
+        <article class="summary-card"><span class="summary-icon summary-icon--progress" aria-hidden="true">↗</span><div><p class="meta-label">Votre prochain progrès</p><h2 id="report-progress-title">Quantifier vos résultats</h2><p id="report-progress-desc">Ajoutez un indicateur concret à chaque réalisation importante.</p></div></article>
+        <article class="summary-card"><span class="summary-icon summary-icon--next" aria-hidden="true">→</span><div><p class="meta-label">Exercice recommandé</p><h2 id="report-exercise-title">Une réponse avec STAR</h2><p id="report-exercise-desc">Retravaillez votre exemple de gestion d'une difficulté.</p></div></article>
       </div>
 
       <section class="report-card criteria-card" aria-labelledby="criteria-title">
@@ -349,11 +349,11 @@
         </div>
       </section>
 
-      <section class="report-card answer-review" aria-labelledby="answer-review-title">
+      <section class="report-card answer-review" id="answer-review-card" aria-labelledby="answer-review-title">
         <div class="report-card__header"><div><p class="meta-label">Réponse à retravailler</p><h2 id="answer-review-title">« Parlez-moi d'une difficulté que vous avez surmontée »</h2></div><span class="star-badge">Méthode STAR</span></div>
         <div class="answer-comparison">
-          <div><h3>Votre réponse</h3><blockquote>« Sur un projet, nous avions beaucoup de retard. J'ai organisé plusieurs réunions avec l'équipe et finalement nous avons réussi à livrer. »</blockquote><p><strong>Ce qui manque :</strong> votre rôle précis, les actions prioritaires et le résultat mesuré.</p></div>
-          <div class="answer-comparison__improved"><h3>Une formulation plus convaincante</h3><blockquote>« À trois semaines du lancement, notre projet accusait dix jours de retard. J'ai réuni les responsables produit et tech pour prioriser les fonctionnalités critiques, puis instauré un suivi quotidien de quinze minutes. Nous avons livré la version essentielle à la date prévue et atteint 92 % d'adoption le premier mois. »</blockquote><button class="copy-button" type="button" id="copy-answer">Copier l'exemple</button></div>
+          <div><h3>Votre réponse</h3><blockquote id="rework-your-answer">« Sur un projet, nous avions beaucoup de retard. J'ai organisé plusieurs réunions avec l'équipe et finalement nous avons réussi à livrer. »</blockquote><p><strong>Ce qui manque :</strong> <span id="rework-shortcomings">votre rôle précis, les actions prioritaires et le résultat mesuré.</span></p></div>
+          <div class="answer-comparison__improved"><h3>Une formulation plus convaincante</h3><blockquote id="rework-improved-answer">« À trois semaines du lancement, notre projet accusait dix jours de retard. J'ai réuni les responsables produit et tech pour prioriser les fonctionnalités critiques, puis instauré un suivi quotidien de quinze minutes. Nous avons livré la version essentielle à la date prévue et atteint 92 % d'adoption le premier mois. »</blockquote><button class="copy-button" type="button" id="copy-answer">Copier l'exemple</button></div>
         </div>
       </section>
 

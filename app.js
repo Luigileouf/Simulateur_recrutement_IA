@@ -948,7 +948,7 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
     }, 1400);
   }
 
-  function buildReport() {
+  async function buildReport() {
     const partial = state.exchangeCount < 3;
     if (partial) {
       $("#report-title").textContent = "Analyse partielle : poursuivez l'entretien";
@@ -961,22 +961,99 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
       $("#criteria-list").innerHTML = ["Clarté et concision", "Pertinence pour le poste", "Qualité des exemples", "Motivation", "Expression orale"].map((criterion) => `
         <article class="criterion"><div><strong>${criterion}</strong><span>Non évalué</span></div><div class="progress-track"><span style="--value:0%"></span></div><strong>—</strong><p>Donnée insuffisante : répondez à au moins trois questions pour obtenir une observation fiable.</p></article>
       `).join("");
+      $("#answer-review-card").hidden = true;
     } else {
-      const score = Math.min(88, 72 + state.exchangeCount * 2);
-      $("#report-title").textContent = "Votre discours est clair et crédible";
-      $("#report-subtitle").textContent = "Vous créez une première impression professionnelle. Vos exemples gagneraient maintenant à être plus précis et mesurables.";
-      $("#score-value").textContent = score;
-      $("#score-unit").textContent = "/100";
-      $("#score-label").textContent = score >= 82 ? "Très bien préparé" : "Prêt à convaincre";
-      $("#score-confidence").textContent = `Analyse fiable · ${state.exchangeCount} réponses`;
-      $("#readiness-ring").style.background = `radial-gradient(circle at center, #5540ad 54%, transparent 55%), conic-gradient(#94e1c2 0 ${score}%, rgba(255,255,255,.2) ${score}% 100%)`;
-      $("#criteria-list").innerHTML = `
-        <article class="criterion"><div><strong>Clarté et concision</strong><span>25 % du résultat</span></div><div class="progress-track"><span style="--value:84%"></span></div><strong>84</strong><p>Votre réponse d'introduction suit un fil clair et reste facile à suivre.</p></article>
-        <article class="criterion"><div><strong>Pertinence pour le poste</strong><span>25 % du résultat</span></div><div class="progress-track"><span style="--value:81%"></span></div><strong>81</strong><p>Vous reliez votre expérience aux principaux enjeux du poste.</p></article>
-        <article class="criterion"><div><strong>Qualité des exemples</strong><span>20 % du résultat</span></div><div class="progress-track"><span style="--value:69%"></span></div><strong>69</strong><p>La situation est compréhensible, mais certains résultats manquent d'indicateurs.</p></article>
-        <article class="criterion"><div><strong>Motivation</strong><span>20 % du résultat</span></div><div class="progress-track"><span style="--value:78%"></span></div><strong>78</strong><p>Votre intérêt est crédible ; citez un élément encore plus spécifique à l'entreprise.</p></article>
-        <article class="criterion"><div><strong>Expression orale</strong><span>10 % du résultat</span></div><div class="progress-track"><span style="--value:76%"></span></div><strong>76</strong><p>Le rythme est posé et professionnel, avec quelques formulations longues.</p></article>
-      `;
+      // Show loading state first
+      $("#report-title").textContent = "Analyse personnalisée en cours...";
+      $("#report-subtitle").textContent = "Notre coach IA analyse vos réponses et prépare vos recommandations personnalisées. Veuillez patienter quelques instants.";
+      $("#score-value").textContent = "...";
+      $("#score-unit").textContent = "";
+      $("#score-label").textContent = "Analyse en cours";
+      $("#score-confidence").textContent = "En attente des résultats";
+      $("#readiness-ring").style.background = "radial-gradient(circle at center, #5540ad 54%, transparent 55%), conic-gradient(rgba(255,255,255,.22) 0 100%)";
+      $("#answer-review-card").hidden = true;
+
+      try {
+        const response = await fetch('/api/generate-report', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            transcript: state.messages,
+            scenario: {
+              id: state.scenario.id,
+              title: state.scenario.title,
+              person: state.scenario.person,
+              role: state.scenario.role,
+              objective: state.scenario.objective,
+              context: state.scenario.context
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP error: " + response.status);
+        }
+
+        const data = await response.json();
+        
+        // Populate fields
+        $("#report-title").textContent = data.reportTitle || "Bilan de votre entretien";
+        $("#report-subtitle").textContent = data.reportSubtitle || "";
+        
+        const score = data.score || 70;
+        $("#score-value").textContent = score;
+        $("#score-unit").textContent = "/100";
+        $("#score-label").textContent = data.readinessLabel || (score >= 82 ? "Très bien préparé" : "Prêt à convaincre");
+        $("#score-confidence").textContent = `Analyse fiable · ${state.exchangeCount} réponses`;
+        $("#readiness-ring").style.background = `radial-gradient(circle at center, #5540ad 54%, transparent 55%), conic-gradient(#94e1c2 0 ${score}%, rgba(255,255,255,.2) ${score}% 100%)`;
+
+        // Point fort, progrès, exercice
+        $("#report-strength-title").textContent = data.pointFortTitle || "Point fort";
+        $("#report-strength-desc").textContent = data.pointFortDesc || "";
+        $("#report-progress-title").textContent = data.progresTitle || "Axe d'amélioration";
+        $("#report-progress-desc").textContent = data.progresDesc || "";
+        $("#report-exercise-title").textContent = data.exerciceTitle || "Exercice";
+        $("#report-exercise-desc").textContent = data.exerciceDesc || "";
+
+        // Criteria list
+        $("#criteria-list").innerHTML = (data.criteria || []).map((c) => {
+          const cScore = c.score || 70;
+          return `
+            <article class="criterion">
+              <div><strong>${c.name}</strong><span>Évaluation</span></div>
+              <div class="progress-track"><span style="--value:${cScore}%"></span></div>
+              <strong>${cScore}</strong>
+              <p>${c.comment || ''}</p>
+            </article>
+          `;
+        }).join("");
+
+        // Rework card
+        if (data.reworkQuestion) {
+          $("#answer-review-card").hidden = false;
+          $("#answer-review-title").textContent = `« ${data.reworkQuestion} »`;
+          $("#rework-your-answer").textContent = `« ${data.reworkYourAnswer || ''} »`;
+          $("#rework-shortcomings").textContent = data.reworkShortcomings || "";
+          $("#rework-improved-answer").textContent = `« ${data.reworkImprovedAnswer || ''} »`;
+        } else {
+          $("#answer-review-card").hidden = true;
+        }
+
+      } catch (err) {
+        console.error("Failed to generate report via Gemini:", err);
+        // Fallback to static or rule-based
+        const fallbackScore = Math.min(88, 72 + state.exchangeCount * 2);
+        $("#report-title").textContent = "Votre discours est clair et crédible";
+        $("#report-subtitle").textContent = "Vos exemples gagneraient maintenant à être plus précis et mesurables. (Rapport généré en mode secours)";
+        $("#score-value").textContent = fallbackScore;
+        $("#score-unit").textContent = "/100";
+        $("#score-label").textContent = fallbackScore >= 82 ? "Très bien préparé" : "Prêt à convaincre";
+        $("#score-confidence").textContent = `Analyse fiable (secours) · ${state.exchangeCount} réponses`;
+        $("#readiness-ring").style.background = `radial-gradient(circle at center, #5540ad 54%, transparent 55%), conic-gradient(#94e1c2 0 ${fallbackScore}%, rgba(255,255,255,.2) ${fallbackScore}% 100%)`;
+        $("#answer-review-card").hidden = false;
+      }
     }
     renderReportTranscript();
   }

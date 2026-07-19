@@ -6,6 +6,7 @@ import asyncio
 import urllib.request
 import urllib.error
 from dotenv import load_dotenv
+from google.genai import types
 from livekit import agents
 from livekit.agents import JobContext, WorkerOptions, cli, AgentSession, Agent, JobRequest
 from livekit.plugins import google
@@ -454,7 +455,13 @@ IMPORTANT - DIRECTIVE DE STYLE ET FORMAT :
         voice=voice_name,
         temperature=0.75,
         instructions=system_instruction,
-        api_key=api_key
+        api_key=api_key,
+        realtime_input_config=types.RealtimeInputConfig(
+            automatic_activity_detection=types.AutomaticActivityDetection(
+                disabled=False,
+                silence_duration_ms=1000
+            )
+        )
     )
     
     session = AgentSession(llm=llm)
