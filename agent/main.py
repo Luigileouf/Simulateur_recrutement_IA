@@ -490,7 +490,7 @@ IMPORTANT - DIRECTIVE DE STYLE ET FORMAT :
             asyncio.create_task(ctx.room.local_participant.publish_data(payload))
 
     await session.start(room=ctx.room, agent=Agent(instructions=system_instruction))
-    await asyncio.sleep(2.0)
+    await asyncio.sleep(0.5)
     await session.generate_reply(instructions=greeting_text)
     logger.info(f"Agent vocal actif pour {transcript_label.lower()}")
 
@@ -504,4 +504,8 @@ async def request_fnc(req: JobRequest):
         await req.reject()
 
 if __name__ == "__main__":
-    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint, request_fnc=request_fnc))
+    cli.run_app(WorkerOptions(
+        entrypoint_fnc=entrypoint,
+        request_fnc=request_fnc,
+        num_idle_processes=1
+    ))
