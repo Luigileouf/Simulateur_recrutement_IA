@@ -490,6 +490,7 @@ IMPORTANT - DIRECTIVE DE STYLE ET FORMAT :
             asyncio.create_task(ctx.room.local_participant.publish_data(payload))
 
     await session.start(room=ctx.room, agent=Agent(instructions=system_instruction))
+    await asyncio.sleep(2.0)
     await session.generate_reply(instructions=greeting_text)
     logger.info(f"Agent vocal actif pour {transcript_label.lower()}")
 

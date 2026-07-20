@@ -1041,6 +1041,29 @@ h3 { margin-bottom: 6px; font-size: 16px; }
   color: var(--ink-soft);
 }
 
+/* Entretien sur mesure modal viewport sizing and inner scrolling */
+#custom-dialog {
+  max-height: 90vh;
+  overflow: hidden;
+}
+#custom-dialog > form {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+#custom-dialog .wizard-step {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+  min-height: 0;
+  margin-bottom: 12px;
+}
+#custom-dialog .wizard-step textarea {
+  max-height: 180px;
+  resize: vertical;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
