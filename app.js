@@ -776,6 +776,8 @@ Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillan
           activeProspect: {
             name: state.scenario.person,
             role: state.scenario.role,
+            position: state.scenario.position,
+            level: state.scenario.level,
             voiceName: 'Aoede',
             systemInstruction: customPrompt
           },

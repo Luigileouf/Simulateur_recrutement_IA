@@ -23,7 +23,7 @@ RECRUITERS = {
         'name': 'Camille Robert',
         'role': 'Responsable recrutement · NovaTech',
         'voice': 'Aoede',
-        'greeting': "Bonjour, merci d'être avec nous aujourd'hui. Pour commencer, pouvez-vous me parler de vous et de votre parcours ?",
+        'greeting': "Bonjour, ravi de vous rencontrer. Je suis Camille Robert, Responsable Recrutement chez NovaTech. Nous développons une plateforme SaaS B2B et cherchons notre futur Product Manager pour piloter la roadmap. Pour commencer notre échange, pouvez-vous me présenter votre parcours ?",
         'instruction': """
 Tu es Camille Robert, Responsable recrutement chez NovaTech, une entreprise développant une plateforme SaaS B2B. Tu fais passer un premier entretien RH pour un poste de Product Manager. Le joueur est le candidat.
 Ton rôle est de mener cet entretien RH de manière professionnelle, bienveillante mais rigoureuse pour évaluer la motivation, la clarté et l'adéquation au poste de Product Manager.
@@ -39,7 +39,7 @@ Voici tes questions clés à poser de manière fluide (pose-les une par une, de 
         'name': 'Sophie Laurent',
         'role': 'Talent Acquisition Partner · Elevate',
         'voice': 'Kore',
-        'greeting': "Bonjour. Pour commencer, qu'est-ce qui vous amène aujourd'hui vers le métier de Business Developer ?",
+        'greeting': "Bonjour, je suis Sophie Laurent, Talent Acquisition Partner chez Elevate. Nous accompagnons plusieurs entreprises en forte croissance sur leurs recrutements commerciaux. J'ai sous les yeux votre profil en reconversion professionnelle pour un poste de Business Developer. Pour commencer, qu'est-ce qui vous amène aujourd'hui vers ce métier ?",
         'instruction': """
 Tu es Sophie Laurent, Talent Acquisition Partner chez Elevate, un cabinet qui recrute des profils commerciaux. Tu fais passer un entretien à un candidat en reconversion pour un poste de Business Developer. Le joueur est le candidat.
 Ton rôle est d'évaluer la motivation, la transférabilité des compétences et la projection du candidat dans ce nouveau rôle.
@@ -55,7 +55,7 @@ Voici tes questions clés (une par une, de manière fluide) :
         'name': 'Thomas Meyer',
         'role': 'Head of Product · OneFlow',
         'voice': 'Fenrir',
-        'greeting': "Bonjour. Quel est le produit dont vous êtes le plus fier et quel rôle exact avez-vous joué ?",
+        'greeting': "Bonjour, je suis Thomas Meyer, Head of Product chez OneFlow. Nous sommes dans une phase d'accélération et cherchons un Product Manager Senior autonome capable de prendre des décisions fortes et d'impacter notre croissance. Pour démarrer, quel est le produit dont vous êtes le plus fier et quel rôle exact y avez-vous joué ?",
         'instruction': """
 Tu es Thomas Meyer, Head of Product chez OneFlow. Tu recrutes un Product Manager Senior et recherches quelqu'un d'autonome capable d'arbitrer et d'obtenir des résultats. Le joueur est le candidat.
 Ton rôle est de tester le leadership, la capacité d'arbitrage et les résultats concrets du candidat.
@@ -71,7 +71,7 @@ Voici tes questions clés (une par une, de manière fluide) :
         'name': 'Nora Diallo',
         'role': 'Lead Engineer · Circuit',
         'voice': 'Kore',
-        'greeting': "Bonjour. Pouvez-vous me présenter une décision technique récente dont vous êtes satisfait ?",
+        'greeting': "Bonjour, je suis Nora Diallo, Lead Engineer chez Circuit. Nous construisons des applications web à fort trafic où la performance, l'accessibilité et la qualité du code sont cruciales. Pour débuter cet entretien technique, pouvez-vous me présenter une décision d'architecture frontend récente dont vous êtes fier ?",
         'instruction': """
 Tu es Nora Diallo, Lead Engineer chez Circuit. Tu évalues un Développeur Front-end sur sa démarche technique, l'accessibilité et la performance. Le joueur est le candidat.
 Ton rôle est d'analyser son raisonnement, ses bonnes pratiques et sa communication technique.
@@ -87,7 +87,7 @@ Voici tes questions clés (une par une, de manière fluide) :
         'name': 'Élise Martin',
         'role': 'People Partner · Looma',
         'voice': 'Aoede',
-        'greeting': "Bonjour. Pour commencer, parlez-moi d'une situation dans laquelle vous avez dû gérer plusieurs priorités urgentes.",
+        'greeting': "Bonjour, je suis Élise Martin, People Partner chez Looma. Nous menons aujourd'hui un entretien comportemental pour le poste de Chef de Projet, en nous basant sur la méthodologie STAR pour évaluer votre gestion de projets et votre collaboration en équipe. Pour commencer, parlez-moi d'une situation concrète où vous avez dû gérer de front plusieurs priorités urgentes.",
         'instruction': """
 Tu es Élise Martin, People Partner chez Looma. Tu mènes un entretien comportemental (méthode STAR) pour un poste de Chef de projet. Le joueur est le candidat.
 Ton rôle est d'obtenir des exemples concrets illustrant le comportement du candidat en situation de stress ou de collaboration.
@@ -103,7 +103,7 @@ Voici tes questions clés (une par une, de manière fluide) :
         'name': 'Antoine Bernard',
         'role': 'Directeur général · Vectra',
         'voice': 'Charon',
-        'greeting': "Bonjour. Nous avons déjà beaucoup parlé de votre parcours. Pourquoi êtes-vous la bonne personne pour ce rôle maintenant ?",
+        'greeting': "Bonjour, ravi de vous rencontrer. Je suis Antoine Bernard, Directeur Général de Vectra. Vous avez validé les étapes précédentes avec succès, et notre objectif aujourd'hui est d'évaluer votre vision stratégique ainsi que votre projection sur le poste de Responsable des opérations. Pour débuter ce dernier entretien, pourquoi êtes-vous la bonne personne pour ce rôle maintenant ?",
         'instruction': """
 Tu es Antoine Bernard, Directeur général de Vectra. Tu fais passer un entretien final pour le poste de Responsable des opérations. Tu cherches de la vision, de la maturité et de l'impact direct. Le joueur est le candidat.
 Ton rôle est de tester la prise de recul stratégique et la projection opérationnelle du candidat.
@@ -119,7 +119,7 @@ Voici tes questions clés (une par une, de manière fluide) :
         'name': 'Sarah Cohen',
         'role': 'Responsable RH · Arpège',
         'voice': 'Aoede',
-        'greeting': "Bonjour. Nous souhaitons avancer avec vous. Quelles sont vos attentes salariales pour ce poste ?",
+        'greeting': "Bonjour, je suis Sarah Cohen, Responsable RH chez Arpège. Nous avons été très convaincus par vos entretiens et souhaitons avancer avec vous sur ce poste de Customer Success Manager. Avant de formaliser notre offre de collaboration, discutons de la rémunération. Pour démarrer, quelles sont vos attentes salariales globales pour ce poste ?",
         'instruction': """
 Tu es Sarah Cohen, Responsable RH chez Arpège. Tu négocies la rémunération globale avec un candidat retenu pour le poste de Customer Success Manager. Le joueur est le candidat.
 Ton rôle est de négocier de façon constructive pour trouver un accord équilibré sans compromettre la relation de confiance.
@@ -299,11 +299,22 @@ def fetch_custom_recruiter(session_id: str):
                     val_obj = active_prospect.get(field_name, {})
                     return val_obj.get('stringValue', default)
                 
+                name = get_str('name', 'Sophie Laurent')
+                role = get_str('role', 'Recruteur personnalisé')
+                position = get_str('position', '')
+                level = get_str('level', '')
+                
+                if position:
+                    level_suffix = f" (niveau {level})" if level else ""
+                    greeting = f"Bonjour, ravi de vous rencontrer. Je suis {name}, {role}. Nous menons cet entretien personnalisé pour le poste de {position}{level_suffix}. Pour commencer notre échange, pouvez-vous me présenter votre parcours ?"
+                else:
+                    greeting = "Bonjour, merci d'être là aujourd'hui. Pour commencer, pouvez-vous me présenter votre parcours et me dire ce qui vous intéresse dans ce poste ?"
+                
                 return {
-                    'name': get_str('name', 'Sophie Laurent'),
-                    'role': get_str('role', 'Recruteur personnalisé'),
+                    'name': name,
+                    'role': role,
                     'voice': get_str('voiceName', 'Aoede'),
-                    'greeting': "Bonjour, merci d'être là aujourd'hui. Pour commencer, pouvez-vous me présenter votre parcours et me dire ce qui vous intéresse dans ce poste ?",
+                    'greeting': greeting,
                     'instruction': get_str('systemInstruction', 'Tu es un recruteur professionnel...')
                 }
     except Exception as e:
